@@ -13,8 +13,9 @@
 - `shorts/`：Shorts 腳本草稿
 - `scripts/`：長片腳本草稿
 - `packaging/`：標題與縮圖（每支影片一個資料夾）
+- `reports/`：數據週報；Studio 匯出的 CSV 放在 `reports/data/`
 - `channel/`：風格檔、縮圖版型（`channel/thumbnail/`）與頻道資料
-- `tools/`：縮圖渲染（`render_thumbnail.js`）、字幕轉寫（`transcribe.py`）
+- `tools/`：縮圖渲染（`render_thumbnail.js`）、字幕轉寫（`transcribe.py`）、數據分析（`analyze_studio.py`）
 
 ## 原則
 
