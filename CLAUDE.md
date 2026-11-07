@@ -11,7 +11,10 @@
 
 - `radar/`：新聞雷達每日報告（`YYYY-MM-DD.md`）
 - `shorts/`：Shorts 腳本草稿
-- `channel/`：風格檔與頻道資料
+- `scripts/`：長片腳本草稿
+- `packaging/`：標題與縮圖（每支影片一個資料夾）
+- `channel/`：風格檔、縮圖版型（`channel/thumbnail/`）與頻道資料
+- `tools/`：縮圖渲染（`render_thumbnail.js`）、字幕轉寫（`transcribe.py`）
 
 ## 原則
 

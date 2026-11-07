@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "DSR"; font-weight: 500; src: url("fonts/NotoSansTC-Medium.ttf"); }
+  @font-face { font-family: "DSR"; font-weight: 900; src: url("fonts/NotoSansTC-Black.ttf"); }
+  :root {
+    --blue: #1f6feb;
+    --blue-dark: #0b3d91;
+    --yellow: #ffd23f;
+    --ink: #111827;
+    --paper: #ffffff;
+    --gray: #6b7280;
+    --gray-bg: #e5e7eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: var(--w); height: var(--h); overflow: hidden; }
+  body {
+    font-family: "DSR", "Microsoft JhengHei", sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #dbeafe 100%);
+    color: var(--ink);
+    position: relative;
+  }
+  .badge {
+    position: absolute; top: var(--pad); left: var(--pad);
+    background: var(--ink); color: var(--paper);
+    font-weight: 900; font-size: calc(var(--u) * 3.2);
+    padding: calc(var(--u) * .8) calc(var(--u) * 2);
+    border-radius: calc(var(--u) * 1.2);
+  }
+  .title {
+    position: absolute; left: var(--pad); right: var(--pad); top: var(--title-top);
+    font-weight: 900; line-height: 1.12; letter-spacing: -.02em;
+    font-size: var(--title-size);
+    text-shadow: 0 calc(var(--u) * .4) 0 rgba(255,255,255,.9);
+  }
+  .title .hl {
+    color: var(--blue-dark);
+    background: linear-gradient(transparent 58%, var(--yellow) 58%);
+    padding: 0 .08em;
+  }
+  .compare {
+    position: absolute; left: var(--pad); right: var(--pad); bottom: var(--pad);
+    height: var(--compare-h);
+    display: flex; align-items: stretch; gap: calc(var(--u) * 2);
+  }
+  .box {
+    flex: 1; border-radius: calc(var(--u) * 2.4);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: calc(var(--u) * 2); text-align: center;
+  }
+  .before { background: var(--gray-bg); color: var(--gray); }
+  .after  { background: var(--blue); color: var(--paper); box-shadow: 0 calc(var(--u) * 1) calc(var(--u) * 3) rgba(31,111,235,.45); flex: 1.25; }
+  .label {
+    font-weight: 900; font-size: calc(var(--u) * 3.4);
+    padding: calc(var(--u) * .3) calc(var(--u) * 1.8); border-radius: 999px; margin-bottom: calc(var(--u) * 1.2);
+  }
+  .before .label { background: var(--gray); color: var(--paper); }
+  .after .label  { background: var(--yellow); color: var(--ink); }
+  .text { font-weight: 900; font-size: var(--box-size); line-height: 1.15; }
+  .before .text { text-decoration: line-through; text-decoration-thickness: calc(var(--u) * .6); text-decoration-color: rgba(220,38,38,.75); }
+  .arrow {
+    align-self: center; font-weight: 900; color: var(--blue-dark);
+    font-size: calc(var(--u) * 7);
+  }
+  .shot {
+    position: absolute; right: var(--pad); top: var(--pad);
+    width: var(--shot-w); border-radius: calc(var(--u) * 1.4);
+    border: calc(var(--u) * .5) solid var(--paper);
+    box-shadow: 0 calc(var(--u) * 1) calc(var(--u) * 3) rgba(0,0,0,.25);
+    transform: rotate(3deg);
+  }
+  /* 橫式 1280x720（長片縮圖） */
+  body.wide {
+    --w: 1280px; --h: 720px; --u: 10px; --pad: 44px;
+    --title-top: 120px; --title-size: 96px;
+    --compare-h: 230px; --box-size: 46px; --shot-w: 360px;
+  }
+  /* 直式 1080x1920（Shorts 封面） */
+  body.vertical {
+    --w: 1080px; --h: 1920px; --u: 14px; --pad: 70px;
+    --title-top: 380px; --title-size: 128px;
+    --compare-h: 640px; --box-size: 64px; --shot-w: 0px;
+  }
+  /* Shorts 下方約 20% 會被頻道名稱和說明文字蓋住，所以內容往上收 */
+  body.vertical .badge { top: 260px; }
+  body.vertical .compare { flex-direction: column; bottom: 480px; }
+  body.vertical .arrow { transform: rotate(90deg); font-size: calc(var(--u) * 6); }
+  body.vertical .shot { display: none; }
+</style>
+</head>
+<body class="wide">
+  <div class="badge" id="badge"></div>
+  <img class="shot" id="shot" alt="">
+  <div class="title" id="title"></div>
+  <div class="compare">
+    <div class="box before"><div class="label" id="beforeLabel">以前</div><div class="text" id="beforeText"></div></div>
+    <div class="arrow">→</div>
+    <div class="box after"><div class="label" id="afterLabel">現在</div><div class="text" id="afterText"></div></div>
+  </div>
+<script>
+  // render_thumbnail.js 會呼叫 apply(spec)
+  function apply(s) {
+    document.body.className = s.format === "vertical" ? "vertical" : "wide";
+    const esc = t => String(t || "").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+    // 標題中用 [[ ]] 包住的字會加黃色螢光筆效果，用 | 換行
+    document.getElementById("title").innerHTML =
+      esc(s.title).replace(/\[\[(.+?)\]\]/g, '<span class="hl">$1</span>').replace(/\|/g, "<br>");
+    const badge = document.getElementById("badge");
+    badge.textContent = s.badge || ""; badge.style.display = s.badge ? "" : "none";
+    document.getElementById("beforeLabel").textContent = s.beforeLabel || "以前";
+    document.getElementById("afterLabel").textContent = s.afterLabel || "現在";
+    document.getElementById("beforeText").innerHTML = esc(s.before).replace(/\|/g, "<br>");
+    document.getElementById("afterText").innerHTML = esc(s.after).replace(/\|/g, "<br>");
+    const shot = document.getElementById("shot");
+    if (s.screenshot) { shot.src = s.screenshot; } else { shot.style.display = "none"; }
+  }
+</script>
+</body>
+</html>
