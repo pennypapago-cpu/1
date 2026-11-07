@@ -1,0 +1,7 @@
+*.mp4
+*.mov
+*.mkv
+*.wav
+*.m4a
+node_modules/
+__pycache__/
